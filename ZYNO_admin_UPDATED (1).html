@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZYNO Admin Panel</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f4f4;color:#111}
+header{background:#0b0b0b;color:#fff;padding:18px 22px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:25px;font-weight:900;letter-spacing:3px}.logout{background:#fff;color:#111;border:0;padding:10px 16px;border-radius:8px;cursor:pointer;font-weight:700}
+.wrap{max-width:1200px;margin:auto;padding:20px}
+.login{max-width:420px;margin:70px auto;background:#fff;padding:28px;border-radius:16px;box-shadow:0 10px 30px #0001}
+h1,h2{margin-top:0}input,textarea,select{width:100%;padding:12px;margin:7px 0 14px;border:1px solid #ddd;border-radius:8px;font-size:15px}
+textarea{min-height:90px;resize:vertical}.btn{border:0;border-radius:8px;padding:11px 15px;font-weight:700;cursor:pointer;margin:3px}.primary{background:#111;color:#fff}.danger{background:#c62828;color:#fff}.light{background:#eee;color:#111}
+.msg{padding:10px;border-radius:8px;background:#f0f0f0;margin:10px 0;display:none}.error{background:#ffe5e5;color:#a00}.ok{background:#e5ffe9;color:#075b16}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:25px}.card{background:#fff;border-radius:14px;padding:18px;box-shadow:0 5px 18px #0000000d}.num{font-size:30px;font-weight:900;margin-top:8px}
+.panel{background:#fff;border-radius:14px;padding:20px;margin-bottom:20px;overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:760px}th,td{padding:11px;border-bottom:1px solid #eee;text-align:left;font-size:14px;vertical-align:top}
+.product-img{width:55px;height:55px;object-fit:cover;border-radius:8px;background:#eee}
+.modal{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;padding:18px;z-index:10}
+.modalbox{background:#fff;width:min(600px,100%);max-height:90vh;overflow:auto;border-radius:15px;padding:22px}
+.actions{display:flex;gap:6px;flex-wrap:wrap}.hidden{display:none!important}
+.small{font-size:13px;color:#666}
+@media(max-width:800px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:500px){.grid{grid-template-columns:1fr}.wrap{padding:12px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">ZYNO ADMIN</div>
+  <button id="logoutBtn" class="logout hidden">Logout</button>
+</header>
+
+<div id="loginBox" class="login">
+  <h1>Admin Login</h1>
+  <p class="small">Use the Firebase Authentication admin account you created.</p>
+  <div id="loginMsg" class="msg"></div>
+  <form id="loginForm">
+    <input id="email" type="email" placeholder="Admin email" required>
+    <input id="password" type="password" placeholder="Password" required>
+    <button class="btn primary" style="width:100%;padding:13px">Login</button>
+  </form>
+</div>
+
+<main id="app" class="wrap hidden">
+  <div id="appMsg" class="msg"></div>
+  <div class="grid">
+    <div class="card"><div>Total Products</div><div id="statProducts" class="num">0</div></div>
+    <div class="card"><div>Total Orders</div><div id="statOrders" class="num">0</div></div>
+    <div class="card"><div>Pending Orders</div><div id="statPending" class="num">0</div></div>
+    <div class="card"><div>Revenue</div><div id="statRevenue" class="num">₹0</div></div>
+  </div>
+
+  <section class="panel">
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap">
+      <div><h2>Products</h2><div class="small">Add/edit/delete products. Customers can read these records after the storefront is connected.</div></div>
+      <button id="addProductBtn" class="btn primary">+ Add Product</button>
+    </div>
+    <div style="overflow:auto;margin-top:12px">
+      <table><thead><tr><th>Image</th><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Sizes</th><th>Actions</th></tr></thead>
+      <tbody id="productsBody"></tbody></table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Orders</h2>
+    <div class="small">Customer name, phone, address, PIN, items, total and order status.</div>
+    <div style="overflow:auto;margin-top:12px">
+      <table><thead><tr><th>Date</th><th>Customer</th><th>Contact</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody id="ordersBody"></tbody></table>
+    </div>
+  </section>
+</main>
+
+<div id="productModal" class="modal">
+ <div class="modalbox">
+  <h2 id="productModalTitle">Add Product</h2>
+  <form id="productForm">
+   <input type="hidden" id="productId">
+   <label>Product name</label><input id="pName" required>
+   <label>Category</label><input id="pCategory" placeholder="T-Shirts / Oversized / Jackets">
+   <label>Price (₹)</label><input id="pPrice" type="number" min="0" required>
+   <label>Stock</label><input id="pStock" type="number" min="0" required>
+   <label>Sizes</label><input id="pSizes" placeholder="S, M, L, XL">
+   <label>Image URL</label><input id="pImage" placeholder="https://...">
+   <div class="small">For now use an image URL. Firebase Storage image upload can be added after Storage is enabled.</div>
+   <label>Description</label><textarea id="pDescription"></textarea>
+   <label>Active</label><select id="pActive"><option value="true">Yes</option><option value="false">No</option></select>
+   <div class="actions">
+    <button type="submit" class="btn primary">Save Product</button>
+    <button type="button" id="closeProduct" class="btn light">Cancel</button>
+   </div>
+  </form>
+ </div>
+</div>
+
+<div id="orderModal" class="modal">
+ <div class="modalbox">
+  <h2>Order Details</h2>
+  <div id="orderDetails"></div>
+  <button id="closeOrder" class="btn light">Close</button>
+ </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD2QbiRzRrKxUhngg1OTS-JrOfBsi4mpBw",
+  authDomain: "zyno-f6516.firebaseapp.com",
+  projectId: "zyno-f6516",
+  storageBucket: "zyno-f6516.firebasestorage.app",
+  messagingSenderId: "987219132218",
+  appId: "1:987219132218:web:00f004d83ab21925cf9a03",
+  measurementId: "G-QV27BTPX2Y"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const $ = id => document.getElementById(id);
+let products = [];
+let orders = [];
+
+function showMsg(el, text, type=""){
+  el.textContent=text; el.className="msg "+type; el.style.display="block";
+}
+function hideMsg(el){el.style.display="none";}
+
+$("loginForm").addEventListener("submit", async e=>{
+  e.preventDefault(); hideMsg($("loginMsg"));
+  try{
+    await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value);
+  }catch(err){
+    showMsg($("loginMsg"),"Login failed: "+err.message.replace("Firebase: ",""),"error");
+  }
+});
+$("logoutBtn").onclick=()=>signOut(auth);
+
+onAuthStateChanged(auth, async user=>{
+  if(user){
+    $("loginBox").classList.add("hidden");
+    $("app").classList.remove("hidden");
+    $("logoutBtn").classList.remove("hidden");
+    await loadAll();
+  }else{
+    $("loginBox").classList.remove("hidden");
+    $("app").classList.add("hidden");
+    $("logoutBtn").classList.add("hidden");
+  }
+});
+
+async function loadAll(){
+  try{
+    const ps=await getDocs(collection(db,"products"));
+    products=ps.docs.map(d=>({id:d.id,...d.data()}));
+    renderProducts();
+    const os=await getDocs(query(collection(db,"orders"),orderBy("createdAt","desc")));
+    orders=os.docs.map(d=>({id:d.id,...d.data()}));
+    renderOrders();
+    updateStats();
+    hideMsg($("appMsg"));
+  }catch(err){
+    showMsg($("appMsg"),"Could not load Firestore data. Check Firestore rules and collection names. "+err.message,"error");
+  }
+}
+
+function renderProducts(){
+  $("productsBody").innerHTML=products.length?products.map(p=>`
+    <tr>
+      <td>${p.imageUrl?`<img class="product-img" src="${escapeHtml(p.imageUrl)}">`:"—"}</td>
+      <td><b>${escapeHtml(p.name||"")}</b><br><span class="small">${escapeHtml(p.description||"").slice(0,80)}</span></td>
+      <td>${escapeHtml(p.category||"")}</td>
+      <td>₹${Number(p.price||0).toLocaleString("en-IN")}</td>
+      <td>${Number(p.stock||0)}</td>
+      <td>${escapeHtml(Array.isArray(p.sizes)?p.sizes.join(", "):(p.sizes||""))}</td>
+      <td><div class="actions"><button class="btn light" onclick="editProduct('${p.id}')">Edit</button><button class="btn danger" onclick="removeProduct('${p.id}')">Delete</button></div></td>
+    </tr>`).join(""):`<tr><td colspan="7">No products yet.</td></tr>`;
+}
+function renderOrders(){
+  $("ordersBody").innerHTML=orders.length?orders.map(o=>{
+    const date=o.createdAt?.toDate?o.createdAt.toDate().toLocaleString("en-IN"):"—";
+    const items=Array.isArray(o.items)?o.items.map(i=>`${i.name||"Item"} × ${i.quantity||1}${i.size?" ("+i.size+")":""}`).join("<br>"):"—";
+    return `<tr>
+      <td>${date}</td><td><b>${escapeHtml(o.customerName||"")}</b></td>
+      <td>${escapeHtml(o.phone||"")}<br>${escapeHtml(o.address||"")} ${o.pin?escapeHtml(o.pin):""}</td>
+      <td>${items}</td><td>₹${Number(o.total||0).toLocaleString("en-IN")}</td>
+      <td>${escapeHtml(o.paymentStatus||"Pending")}</td>
+      <td><select onchange="changeOrderStatus('${o.id}',this.value)">
+        ${["Pending","Confirmed","Packed","Shipped","Delivered","Cancelled"].map(s=>`<option ${o.orderStatus===s?"selected":""}>${s}</option>`).join("")}
+      </select></td>
+      <td><button class="btn light" onclick="viewOrder('${o.id}')">View</button></td>
+    </tr>`;
+  }).join(""):`<tr><td colspan="8">No orders yet.</td></tr>`;
+}
+function updateStats(){
+  $("statProducts").textContent=products.length;
+  $("statOrders").textContent=orders.length;
+  $("statPending").textContent=orders.filter(o=>(o.orderStatus||"Pending")==="Pending").length;
+  const revenue=orders.filter(o=>(o.orderStatus||"")!=="Cancelled").reduce((s,o)=>s+Number(o.total||0),0);
+  $("statRevenue").textContent="₹"+revenue.toLocaleString("en-IN");
+}
+function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
+
+$("addProductBtn").onclick=()=>{
+  $("productModalTitle").textContent="Add Product";
+  $("productForm").reset(); $("productId").value="";
+  $("pActive").value="true"; $("productModal").style.display="flex";
+};
+$("closeProduct").onclick=()=>{$("productModal").style.display="none"};
+
+window.editProduct=id=>{
+ const p=products.find(x=>x.id===id); if(!p)return;
+ $("productModalTitle").textContent="Edit Product"; $("productId").value=id;
+ $("pName").value=p.name||"";$("pCategory").value=p.category||"";$("pPrice").value=p.price??0;
+ $("pStock").value=p.stock??0;$("pSizes").value=Array.isArray(p.sizes)?p.sizes.join(", "):(p.sizes||"");
+ $("pImage").value=p.imageUrl||"";$("pDescription").value=p.description||"";$("pActive").value=String(p.active!==false);
+ $("productModal").style.display="flex";
+};
+$("productForm").onsubmit=async e=>{
+ e.preventDefault();
+ const data={name:$("pName").value.trim(),category:$("pCategory").value.trim(),price:Number($("pPrice").value),stock:Number($("pStock").value),
+ sizes:$("pSizes").value.split(",").map(x=>x.trim()).filter(Boolean),imageUrl:$("pImage").value.trim(),description:$("pDescription").value.trim(),
+ active:$("pActive").value==="true",updatedAt:serverTimestamp()};
+ try{
+  const id=$("productId").value;
+  if(id) await updateDoc(doc(db,"products",id),data);
+  else await addDoc(collection(db,"products"),{...data,createdAt:serverTimestamp()});
+  $("productModal").style.display="none"; await loadAll();
+ }catch(err){showMsg($("appMsg"),"Product save failed: "+err.message,"error");}
+};
+window.removeProduct=async id=>{
+ if(!confirm("Delete this product?"))return;
+ try{await deleteDoc(doc(db,"products",id));await loadAll();}
+ catch(err){showMsg($("appMsg"),"Delete failed: "+err.message,"error");}
+};
+window.changeOrderStatus=async(id,status)=>{
+ try{await updateDoc(doc(db,"orders",id),{orderStatus:status,updatedAt:serverTimestamp()});await loadAll();}
+ catch(err){showMsg($("appMsg"),"Order update failed: "+err.message,"error");}
+};
+window.viewOrder=id=>{
+ const o=orders.find(x=>x.id===id);if(!o)return;
+ const items=Array.isArray(o.items)?o.items.map(i=>`<li>${escapeHtml(i.name||"Item")} — Qty: ${i.quantity||1} — Size: ${escapeHtml(i.size||"-")} — ₹${Number(i.price||0)}</li>`).join(""):"<li>No item details</li>";
+ $("orderDetails").innerHTML=`<p><b>Customer:</b> ${escapeHtml(o.customerName||"")}</p>
+ <p><b>Phone:</b> ${escapeHtml(o.phone||"")}</p><p><b>Address:</b> ${escapeHtml(o.address||"")}</p>
+ <p><b>PIN:</b> ${escapeHtml(o.pin||"")}</p><p><b>Payment:</b> ${escapeHtml(o.paymentStatus||"Pending")}</p>
+ <p><b>Status:</b> ${escapeHtml(o.orderStatus||"Pending")}</p><p><b>Total:</b> ₹${Number(o.total||0).toLocaleString("en-IN")}</p>
+ <h3>Items</h3><ul>${items}</ul>`;
+ $("orderModal").style.display="flex";
+};
+$("closeOrder").onclick=()=>{$("orderModal").style.display="none"};
+</script>
+</body>
+</html>
