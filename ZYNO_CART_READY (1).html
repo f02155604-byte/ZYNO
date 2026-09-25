@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZYNO — Wear Your Identity</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--black:#0b0b0b;--cream:#f5f0e8;--gold:#c9a96e;--white:#fff}
+body{font-family:Arial,Helvetica,sans-serif;background:#f8f6f2;color:#111}
+button{font-family:inherit;cursor:pointer}a{text-decoration:none;color:inherit}
+header{position:sticky;top:0;z-index:10;height:72px;background:#0b0b0b;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 5%}
+.logo{font-size:28px;font-weight:900;letter-spacing:7px}
+nav{display:flex;gap:28px;font-size:13px;text-transform:uppercase;letter-spacing:1px}
+nav a:hover{color:var(--gold)}
+.cart{background:#fff;border:0;border-radius:25px;padding:12px 18px;font-weight:700}
+.hero{min-height:650px;background:linear-gradient(90deg,rgba(0,0,0,.8),rgba(0,0,0,.2)),url("https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1800&q=85") center/cover;display:flex;align-items:center;padding:8%;color:#fff}
+.hero small{color:var(--gold);letter-spacing:4px;font-weight:bold}
+.hero h1{font-family:Georgia,serif;font-size:clamp(55px,9vw,105px);line-height:.9;margin:20px 0}
+.hero p{max-width:500px;color:#ddd;line-height:1.7;margin-bottom:30px}
+.btn{background:#fff;border:0;padding:16px 28px;font-weight:800;text-transform:uppercase}
+.btn:hover{background:var(--gold);color:#fff}
+.section{padding:80px 6%}
+.heading{margin-bottom:35px}.heading p{color:#777;font-size:12px;letter-spacing:2px}.heading h2{font-family:Georgia,serif;font-size:46px;margin-top:8px}
+.categories,.products{display:grid;grid-template-columns:repeat(5,1fr);gap:18px}
+.category{height:330px;position:relative;overflow:hidden;background:#222;color:#fff}
+.category img,.product img{width:100%;height:100%;object-fit:cover;transition:.5s}
+.category:hover img,.product:hover img{transform:scale(1.05)}
+.category div{position:absolute;inset:0;display:flex;align-items:end;padding:22px;background:linear-gradient(transparent,rgba(0,0,0,.8))}
+.product{background:#fff;position:relative;cursor:pointer}
+.product-image{height:390px;overflow:hidden}.product-info{padding:18px}.product-info small{color:#999}.product-info h3{margin:8px 0}.price{font-weight:800}
+.wish{position:absolute;right:12px;top:12px;width:38px;height:38px;border:0;border-radius:50%;background:#fff;z-index:2;font-size:18px}
+.banner{margin:0 6% 70px;min-height:350px;background:linear-gradient(90deg,rgba(0,0,0,.8),rgba(0,0,0,.15)),url("https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=1600&q=85") center/cover;color:#fff;padding:7%;display:flex;align-items:center}
+.banner h2{font-family:Georgia,serif;font-size:52px;margin:12px 0}.banner p{color:#ddd;margin-bottom:20px}
+.features{background:#0b0b0b;color:#fff;display:grid;grid-template-columns:repeat(4,1fr);padding:40px 6%;gap:20px;text-align:center}.feature p{color:#888;font-size:12px;margin-top:8px}
+.about{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}.about img{width:100%;height:500px;object-fit:cover}.about h2{font-family:Georgia,serif;font-size:52px;margin:15px 0}.about p{color:#666;line-height:1.8;margin-bottom:18px}
+.news{background:var(--cream);padding:70px 20px;text-align:center}.news h2{font-family:Georgia,serif;font-size:42px;margin-bottom:10px}.news p{color:#777;margin-bottom:22px}.news form{max-width:500px;margin:auto;display:flex}.news input{flex:1;padding:15px;border:1px solid #ccc}.news button{background:#111;color:#fff;border:0;padding:0 22px;font-weight:bold}
+footer{background:#0b0b0b;color:#fff;padding:60px 6% 25px}.foot{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:30px;margin-bottom:50px}.foot p,.foot li{color:#888;line-height:1.8;list-style:none;font-size:14px}.copy{border-top:1px solid #292929;padding-top:20px;color:#666;font-size:12px}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:20;align-items:center;justify-content:center;padding:18px}.modal.show{display:flex}.box{background:#fff;max-width:850px;width:100%;display:grid;grid-template-columns:1fr 1fr;position:relative;max-height:90vh;overflow:auto}.box-img{min-height:520px}.box-img img{width:100%;height:100%;object-fit:cover}.box-info{padding:40px}.box-info h2{font-family:Georgia,serif;font-size:38px;margin:12px 0}.desc{color:#666;line-height:1.7;margin:20px 0}.close{position:absolute;right:12px;top:12px;border:0;border-radius:50%;width:38px;height:38px;background:#fff;font-size:20px;z-index:2}.sizes{display:flex;gap:7px;margin:12px 0 25px}.size{background:#fff;border:1px solid #ccc;padding:10px 16px}.size.selected{background:#111;color:#fff}.add{width:100%;padding:16px;background:#111;color:#fff;border:0;font-weight:bold}
+@media(max-width:800px){nav{display:none}.hero{min-height:580px;padding:30px}.hero h1{font-size:60px}.section{padding:60px 20px}.categories,.products{grid-template-columns:1fr 1fr}.category{height:240px}.product-image{height:250px}.banner{margin:0 20px 50px;padding:30px}.banner h2{font-size:40px}.features{grid-template-columns:1fr 1fr}.about{grid-template-columns:1fr;gap:30px}.about img{height:350px}.foot{grid-template-columns:1fr 1fr}.box{grid-template-columns:1fr}.box-img{height:330px;min-height:330px}}
+.cart-panel{position:fixed;right:-420px;top:0;width:min(420px,92vw);height:100vh;background:#fff;z-index:1000;box-shadow:-8px 0 30px rgba(0,0,0,.2);transition:.3s;display:flex;flex-direction:column}.cart-panel.show{right:0}.cart-head{display:flex;justify-content:space-between;align-items:center;padding:22px;border-bottom:1px solid #ddd}.cart-head button{border:0;background:#111;color:#fff;border-radius:50%;width:36px;height:36px;font-size:22px}.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;display:none}.cart-overlay.show{display:block}#cartItems{padding:18px;overflow:auto;flex:1}.cart-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #eee}.cart-item img{width:75px;height:90px;object-fit:cover}.cart-item-info{flex:1}.cart-item-info h4{margin:0 0 6px}.cart-item-info small{color:#777}.remove-item{margin-top:8px;border:0;background:#eee;padding:6px 10px}.cart-foot{padding:18px;border-top:1px solid #ddd}.cart-foot>div{display:flex;justify-content:space-between;margin-bottom:14px}.checkout-btn{width:100%;padding:15px;background:#111;color:#fff;border:0;font-weight:bold}.empty-cart{text-align:center;color:#777;padding:50px 10px}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">ZYNO</div>
+<nav><a href="#home">Home</a><a href="#shop">Shop</a><a href="#categories">Categories</a><a href="#about">About</a><a href="#contact">Contact</a></nav>
+<button class="cart" onclick="openCart()">🛒 Cart (<span id="cartCount">0</span>)</button>
+</header>
+
+<section class="hero" id="home">
+<div><small>NEW SEASON 2026</small><h1>WEAR<br>YOUR<br>IDENTITY.</h1><p>Premium everyday clothing designed for people who don't follow the crowd.</p><button class="btn" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">Shop Collection</button></div>
+</section>
+
+<section class="section" id="categories">
+<div class="heading"><p>EXPLORE ZYNO</p><h2>Shop By Category</h2></div>
+<div class="categories">
+<a class="category" href="#shop" onclick="filterCategory('T-Shirts');return false;"><img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80"><div><h3>T-Shirts →</h3></div></a>
+<a class="category" href="#shop" onclick="filterCategory('Shirts');return false;"><img src="https://images.unsplash.com/photo-1603252110481-7ba873bf42ab?auto=format&fit=crop&w=900&q=80"><div><h3>Shirts →</h3></div></a>
+<a class="category" href="#shop" onclick="filterCategory('Boxy Shirts');return false;"><img src="https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=900&q=80"><div><h3>Boxy Shirts →</h3></div></a>
+<a class="category" href="#shop" onclick="filterCategory('Baggy Jeans & Jeans');return false;"><img src="https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=900&q=80"><div><h3>Baggy Jeans & Jeans →</h3></div></a>
+<a class="category" href="#shop" onclick="filterCategory('Hoodies');return false;"><img src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=900&q=80"><div><h3>Hoodies →</h3></div></a>
+</div>
+</section>
+
+<section class="section" id="shop">
+<div class="heading"><p id="shopLabel">ZYNO COLLECTION</p><h2 id="shopTitle">New Arrivals</h2></div>
+<div class="products" id="productGrid"><p id="productStatus" style="grid-column:1/-1;color:#777">Loading ZYNO products...</p></div>
+</section>
+
+<section class="banner"><div><p>LIMITED DROP</p><h2>YOUR STYLE.<br>YOUR RULES.</h2><p>Discover the latest ZYNO collection.</p><button class="btn" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">Explore Now</button></div></section>
+
+<section class="features">
+<div class="feature"><div>🚚</div><h3>Fast Delivery</h3><p>Quick delivery across India</p></div>
+<div class="feature"><div>🔒</div><h3>Secure Payment</h3><p>Safe and secure online checkout</p></div>
+<div class="feature"><div>✨</div><h3>Premium Quality</h3><p>Made for everyday comfort</p></div>
+</section>
+
+<section class="section" id="about">
+<div class="about">
+<img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=1100&q=85">
+<div><p>THE ZYNO STORY</p><h2>More Than<br>Just Clothes.</h2><p>ZYNO is built around one simple idea: your clothes should represent who you are.</p><p>From everyday essentials to modern streetwear, we create clean, confident pieces designed for the next generation.</p><button class="btn">Discover ZYNO</button></div>
+</div>
+</section>
+
+<section class="news"><h2>Join The ZYNO Club</h2><p>Get new drop updates, exclusive offers and more.</p><form onsubmit="subscribe(event)"><input type="email" placeholder="Your email address" required><button>JOIN</button></form></section>
+
+<footer id="contact">
+<div class="foot"><div><span class="logo">ZYNO</span><p>Modern clothing for people who wear their identity with confidence.</p></div><div><h4>SHOP</h4><ul><li>T-Shirts</li><li>Oversized</li><li>Jackets</li><li>Streetwear</li></ul></div><div><h4>HELP</h4><ul><li>Contact / Support: 6290727529</li><li>Shipping</li><li>Track Order</li></ul></div><div><h4>FOLLOW</h4><ul><li>Instagram: ZYNO</li></ul></div></div>
+<div class="copy">© 2026 ZYNO. All Rights Reserved.</div>
+</footer>
+
+<div id="cartOverlay" class="cart-overlay" onclick="closeCart()"></div>
+<div id="cartPanel" class="cart-panel">
+  <div class="cart-head">
+    <h2 style="margin:0;">Your Cart</h2>
+    <button onclick="closeCart()" aria-label="Close cart">×</button>
+  </div>
+  <div id="cartItems"></div>
+  <div class="cart-foot">
+    <div><strong>Total</strong><strong id="cartTotal">₹0</strong></div>
+    <button class="checkout-btn" onclick="checkoutCart()">CHECKOUT</button>
+  </div>
+</div>
+
+<div class="modal" id="modal"><div class="box"><button class="close" onclick="closeProduct()">×</button><div class="box-img"><img id="mImg"></div><div class="box-info"><small>ZYNO COLLECTION</small><h2 id="mTitle"></h2><h3 id="mPrice"></h3><p class="desc" id="mDesc"></p><b>Select Size</b><div class="sizes"><button class="size" onclick="size(this)">S</button><button class="size" onclick="size(this)">M</button><button class="size" onclick="size(this)">L</button><button class="size" onclick="size(this)">XL</button></div><button class="add" onclick="addCart()">ADD TO CART</button></div></div></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD2QbiRzRrKxUhngg1OTS-JrOfBsi4mpBw",
+  authDomain: "zyno-f6516.firebaseapp.com",
+  projectId: "zyno-f6516",
+  storageBucket: "zyno-f6516.firebasestorage.app",
+  messagingSenderId: "987219132218",
+  appId: "1:987219132218:web:00f004d83ab21925cf9a03",
+  measurementId: "G-QV27BTPX2Y"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let count = 0;
+let currentProduct = null;
+let selectedSize = null;
+let cartItems = [];
+
+window.openProduct = function(product) {
+  currentProduct = product;
+  document.getElementById("mTitle").innerText = product.name || "ZYNO Product";
+  document.getElementById("mPrice").innerText = "₹" + Number(product.price || 0).toLocaleString("en-IN");
+  document.getElementById("mDesc").innerText = product.description || "Premium ZYNO clothing.";
+  document.getElementById("mImg").src = product.imageUrl || "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1000&q=85";
+
+  const sizesBox = document.querySelector(".sizes");
+  const sizes = Array.isArray(product.sizes) && product.sizes.length ? product.sizes : ["S","M","L","XL"];
+  sizesBox.innerHTML = sizes.map(s => `<button class="size" onclick="size(this)">${s}</button>`).join("");
+  selectedSize = null;
+  document.querySelectorAll(".size").forEach(b => b.classList.remove("selected"));
+
+  document.getElementById("modal").classList.add("show");
+};
+
+window.closeProduct = function() {
+  document.getElementById("modal").classList.remove("show");
+};
+
+window.size = function(x) {
+  document.querySelectorAll(".size").forEach(b => b.classList.remove("selected"));
+  x.classList.add("selected");
+  selectedSize = x.innerText.trim();
+};
+
+window.addCart = function() {
+  if (!currentProduct) return;
+  if (!selectedSize) {
+    alert("Please select a size first.");
+    return;
+  }
+  cartItems.push({product: currentProduct, size: selectedSize});
+  updateCart();
+  window.closeProduct();
+  alert((currentProduct.name || "Product") + " — Size " + selectedSize + " added to cart!");
+};
+
+window.openCart = function(){
+  updateCart();
+  document.getElementById("cartPanel").classList.add("show");
+  document.getElementById("cartOverlay").classList.add("show");
+};
+window.closeCart = function(){
+  document.getElementById("cartPanel").classList.remove("show");
+  document.getElementById("cartOverlay").classList.remove("show");
+};
+window.removeCartItem = function(index){
+  cartItems.splice(index,1);
+  updateCart();
+};
+function updateCart(){
+  count = cartItems.length;
+  document.getElementById("cartCount").innerText = count;
+  const box=document.getElementById("cartItems");
+  if(!cartItems.length){ box.innerHTML='<div class="empty-cart">Your cart is empty.</div>'; document.getElementById("cartTotal").innerText='₹0'; return; }
+  let total=0;
+  box.innerHTML=cartItems.map((item,i)=>{ const p=item.product||{}; const price=Number(p.price||0); total+=price; return `<div class="cart-item"><img src="${p.imageUrl||''}" alt=""><div class="cart-item-info"><h4>${p.name||'Product'}</h4><small>Size: ${item.size}</small><br><b>₹${price.toLocaleString('en-IN')}</b><br><button class="remove-item" onclick="removeCartItem(${i})">Remove</button></div></div>`; }).join('');
+  document.getElementById("cartTotal").innerText='₹'+total.toLocaleString('en-IN');
+}
+window.checkoutCart = function(){
+  if(!cartItems.length){ alert('Your cart is empty.'); return; }
+  alert('Checkout will be connected next. Your cart has '+cartItems.length+' item(s).');
+};
+
+window.subscribe = function(e) {
+  e.preventDefault();
+  alert("Welcome to the ZYNO Club!");
+};
+
+function money(value) {
+  return "₹" + Number(value || 0).toLocaleString("en-IN");
+}
+
+let allProducts = [];
+let activeCategory = "";
+
+function normalizeCategory(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function categoryMatches(productCategory, selectedCategory) {
+  const a = normalizeCategory(productCategory);
+  const b = normalizeCategory(selectedCategory);
+  if (!a || !b) return false;
+  if (a === b) return true;
+
+  // Also allow simple singular/plural differences, e.g. Shirt / Shirts.
+  if (a === b + "s" || b === a + "s") return true;
+  if (a.endsWith("s") && a.slice(0, -1) === b) return true;
+  if (b.endsWith("s") && b.slice(0, -1) === a) return true;
+
+  return false;
+}
+
+window.filterCategory = function(category) {
+  activeCategory = category;
+  const filtered = allProducts.filter(product => categoryMatches(product.category, category));
+  document.getElementById("shopLabel").innerText = category.toUpperCase();
+  document.getElementById("shopTitle").innerText = category;
+  renderProducts(filtered, category);
+  document.getElementById("shop").scrollIntoView({behavior:"smooth"});
+};
+
+window.showAllProducts = function() {
+  activeCategory = "";
+  document.getElementById("shopLabel").innerText = "ZYNO COLLECTION";
+  document.getElementById("shopTitle").innerText = "New Arrivals";
+  renderProducts(allProducts);
+};
+
+function renderProducts(products, category = "") {
+  const grid = document.getElementById("productGrid");
+  if (!products.length) {
+    grid.innerHTML = '<p style="grid-column:1/-1;color:#777;text-align:center;padding:40px 0">' + (category ? 'No products found in ' + category + '.' : 'No products available right now. New products will appear here after adding them from the Admin Panel.') + '</p>';
+    return;
+  }
+
+  grid.innerHTML = products.map(product => {
+    const image = product.imageUrl || "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=85";
+    const category = product.category || "ZYNO COLLECTION";
+    const name = product.name || "ZYNO Product";
+    const price = money(product.price);
+    return `
+      <div class="product" onclick='openProduct(${JSON.stringify(product).replace(/'/g, "&#39;")})'>
+        <button class="wish" onclick="event.stopPropagation()">♡</button>
+        <div class="product-image"><img src="${image}" alt="${name.replace(/"/g, "&quot;")}"></div>
+        <div class="product-info">
+          <small>${category}</small>
+          <h3>${name}</h3>
+          <span class="price">${price}</span>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+async function loadProducts() {
+  const status = document.getElementById("productStatus");
+  try {
+    const snapshot = await getDocs(collection(db, "products"));
+    const products = snapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
+      .filter(product => product.active !== false);
+
+    allProducts = products;
+    renderProducts(allProducts);
+  } catch (error) {
+    console.error("ZYNO product loading error:", error);
+    status.innerText = "Products could not be loaded. Please refresh the page.";
+  }
+}
+
+loadProducts();
+</script>
+<div class="cart-panel" id="cartPanel"><div class="cart-head"><h2>Your Cart</h2><button onclick="closeCart()">×</button></div><div id="cartItems"></div><div class="cart-foot"><div><b>Total</b><b id="cartTotal">₹0</b></div><button class="checkout-btn" onclick="checkoutCart()">CHECKOUT</button></div></div><div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+
+<script>
+(function(){
+  if (window.__zynoCartFallbackLoaded) return;
+  window.__zynoCartFallbackLoaded = true;
+
+  function getCartItems(){
+    try { return JSON.parse(localStorage.getItem("zyno_cart") || "[]"); }
+    catch(e){ return []; }
+  }
+  function saveCartItems(items){
+    localStorage.setItem("zyno_cart", JSON.stringify(items));
+  }
+  function syncCartCount(){
+    var items = getCartItems();
+    var el = document.getElementById("cartCount");
+    if(el) el.innerText = items.length;
+  }
+  window.openCart = function(){
+    var panel = document.getElementById("cartPanel");
+    var overlay = document.getElementById("cartOverlay");
+    if(panel) panel.classList.add("show");
+    if(overlay) overlay.classList.add("show");
+    renderCart();
+  };
+  window.closeCart = function(){
+    var panel = document.getElementById("cartPanel");
+    var overlay = document.getElementById("cartOverlay");
+    if(panel) panel.classList.remove("show");
+    if(overlay) overlay.classList.remove("show");
+  };
+  window.removeCartItem = function(index){
+    var items = getCartItems();
+    items.splice(index,1);
+    saveCartItems(items);
+    syncCartCount();
+    renderCart();
+  };
+  function renderCart(){
+    var box = document.getElementById("cartItems");
+    var totalEl = document.getElementById("cartTotal");
+    if(!box) return;
+    var items = getCartItems();
+    if(!items.length){
+      box.innerHTML = '<div class="empty-cart">Your cart is empty.</div>';
+      if(totalEl) totalEl.innerText = "₹0";
+      return;
+    }
+    var total = 0;
+    box.innerHTML = items.map(function(item, i){
+      var p = item.product || {};
+      var price = Number(p.price || 0);
+      total += price;
+      return '<div class="cart-item">' +
+        '<img src="' + (p.imageUrl || "") + '" alt="">' +
+        '<div class="cart-item-info">' +
+        '<h4>' + (p.name || "Product") + '</h4>' +
+        '<small>Size: ' + (item.size || "") + '</small><br>' +
+        '<b>₹' + price.toLocaleString("en-IN") + '</b><br>' +
+        '<button class="remove-item" onclick="removeCartItem(' + i + ')">Remove</button>' +
+        '</div></div>';
+    }).join("");
+    if(totalEl) totalEl.innerText = "₹" + total.toLocaleString("en-IN");
+  }
+  window.addCart = function(){
+    var product = window.currentProduct;
+    var size = window.selectedSize;
+    if(!product){
+      alert("Please select a product first.");
+      return;
+    }
+    if(!size){
+      alert("Please select a size first.");
+      return;
+    }
+    var items = getCartItems();
+    items.push({product: product, size: size});
+    saveCartItems(items);
+    syncCartCount();
+    if(typeof window.closeProduct === "function") window.closeProduct();
+    alert((product.name || "Product") + " — Size " + size + " added to cart!");
+  };
+  window.checkoutCart = function(){
+    var items = getCartItems();
+    if(!items.length){ alert("Your cart is empty."); return; }
+    alert("Checkout will be connected next. Your cart has " + items.length + " item(s).");
+  };
+
+  // Make the button explicitly clickable even if the inline handler is not
+  // available yet.
+  document.addEventListener("DOMContentLoaded", function(){
+    var btn = document.querySelector(".cart");
+    if(btn) btn.addEventListener("click", window.openCart);
+    syncCartCount();
+  });
+  syncCartCount();
+})();
+</script>
+
+</body>
+</html>
